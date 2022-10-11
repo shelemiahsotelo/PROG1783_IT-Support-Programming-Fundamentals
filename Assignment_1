@@ -78,6 +78,7 @@ def getOrder():                          # Function to gather customer's order/s
                 # Remove previous order/s.
                 orders = []
                 quantities = []
+                print("\n")
                 print("Order cleared! Pleasee enter your order again :)")
                 # Order again.
                 continue
