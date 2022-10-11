@@ -1,0 +1,168 @@
+#Assignment_1
+#Arnold's Amazing Eats II
+#Shelemiah Sotelo_8823190
+
+
+# Put all menu in a list
+MENU = [
+    "Pork Sinigang", 
+    "Chicken Adobo", 
+    "Pancit Canton", 
+    "Beef Teriyaki", 
+    "Chicken Curry"
+]
+# Put all prices in a list
+PRICE = [
+    20,
+    25,
+    12,
+    30,
+    40
+]
+
+
+def custDetails():     # Function for customer details.
+    customer = ["name", "last name", "street number", "street name", "unit number", "city", "province", "postal code", "instructions", "number"] 
+    custInfo = "N"
+    while (custInfo.upper() == 'N'):
+
+        customer[0] = input("Please enter your first name: ").capitalize()
+        customer[1] = input("Please enter your last name: ").capitalize()
+        customer[2] = input("Enter address:\nStreet number: ")
+        customer[3] = input("Street Name: ").capitalize()
+        customer[4] = input("Unit if applicable (leave blank if none): ").capitalize()
+        customer[5] = input("City: ").capitalize()
+        customer[6] = input("Province: ").capitalize()
+        customer[7] = input("Postal Code: ").capitalize()
+        customer[8] = input("Special instructions for deliveries from this address: ").capitalize()
+        customer[9] = input("Phone number: ")
+
+        print("\n \nCustomer's Info:\nName: ",customer[0], customer[1],     # For confirming of customer's info. 
+              "\nAdress: ",customer[2] ,customer[3] ,customer[4],",",customer[5],",",customer[6],",",customer[7],
+              "\nSpecial Instructions: ",customer[8],"\nPhone Number: ",customer[9] )
+        custInfo = input("Are these correct?: Y/N : ") 
+    return customer
+
+
+def displayMenu(menuList, priceList):     # Function to show list of foods available in menu.
+    menuLength = len(menuList)
+    print("\nMENU:")
+    for i in range(menuLength):
+        print((i+1),":",menuList[i], '- $', priceList[i])
+def getOrder():                          # Function to gather customer's order/s
+    orders = []
+    quantities = []
+    while True:
+        print("\nPick your order from 1-5")
+        currentOrder = int(input())
+        print("Enter quantity")
+        currentQuantity = int(input())
+        orders.append(currentOrder)
+        quantities.append(currentQuantity)
+        
+        addOrder = input("\nWould you like to add order? Y/N: ")
+        if addOrder.strip().upper()=="Y":
+            continue
+        else:
+            # Show order and quantity
+            ordersLength = len(orders)
+            print("\n")
+            for i in range(ordersLength):
+                print(MENU[orders[i]-1], "-", quantities[i],"pcs")
+            # Ask confirmation for whole order
+            confirm = input("Please confirm order/s: Y/N :")
+            if confirm.strip().upper()=="Y":
+                # compute total
+                return [orders, quantities]
+            else:
+                # Remove previous order/s.
+                orders = []
+                quantities = []
+                print("Order cleared! Pleasee enter your order again :)")
+                # Order again.
+                continue
+                
+def computeTotal(orders, quantities):         # Function for computation of total of order/s.
+    total = 0
+    for i in range(len(orders)):
+        # Item * quantity
+        total += PRICE[orders[i]-1]*quantities[i]
+    return total
+
+
+def studentDisc(total):                       # Function for computation of student discount.
+    student = input("Are you a student? Y/N:")
+    if student.strip().upper() == "Y":
+    #compute student discount
+        stuDiscount = total*(1-0.10)
+        return stuDiscount
+    else:
+        return total
+
+def withHST(total):                           # Function for computation of tax.
+    HSTax = total*(1+0.13)
+    return HSTax
+
+def discounts(total):                         # Function for additional discounts for certain amounts.
+    if total < 100:
+        addDisc = total*(1-.05)
+    elif total >= 100 and total < 500:
+        addDisc = total*(1-.10)
+    elif total >= 500:
+        addDisc = total*(1-.15)
+    return addDisc
+
+def receipt(orders, quantities, total, discount, tax, studentdiscount, customer): # Function for receipt.
+    print("\n \n*OFFICIAL RECEIPT*")
+    print("Name:", customer[0], customer[1])
+    print("Contact Number:", customer[9])
+    print("Address: ", customer[2],customer[3],customer[4])
+    print("         ", customer[5],",",customer[6],",",customer[7])
+    print("\n")
+    print("                         Item    Item")
+    print("Order                     Qty    Price       Total")
+    print("-------------            ----   ------       --------")
+    for i in range(len(orders)):
+        print(MENU[orders[i]-1], "          ", quantities[i],"    ", PRICE[orders[i]-1],"          ", (quantities[i] * PRICE[orders[i]-1]))
+    print("Additional discounts:                        ", "{:.2f}".format(discount-total))
+    print("10% student savings                          ", "{:.2f}".format(studentdiscount-discount))
+    print("                                  Sub total: ", "{:.2f}".format(studentdiscount))
+    print("                                  Tax (13%): ", "{:.2f}".format(tax-studentdiscount))
+    print("                                  --------------------")
+    print("                                  TOTAL:     ", "{:.2f}".format(tax))
+    print("\n")
+    print("Special Instructions: ",  customer[8])
+
+
+
+print("Welcome to Arnold's Amazing East II!")       # Welcome greetings
+
+
+customer = custDetails()
+
+
+# Flow
+displayMenu(MENU, PRICE)
+# Get orders and quantities
+details = getOrder() # [orders,quantities]
+orders = details[0]
+quantities = details[1]
+
+# Compute total
+total = computeTotal(orders, quantities)
+print("Items total:", "{:.2f}".format(total))
+
+#additional discounts
+addDisc = discounts(total)
+print("Discounted price:", "{:.2f}".format(addDisc))
+
+#for student discount
+discountstu = studentDisc(addDisc)
+print("Student discount price:", "{:.2f}".format(discountstu))
+
+#for HST
+withTax = withHST(discountstu)
+print("With HST:", "{:.2f}".format(withTax))
+
+
+receipt(orders, quantities, total, addDisc, withTax, discountstu, customer)
