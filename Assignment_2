@@ -1,0 +1,241 @@
+#Assignment_2
+#Arnold's Amazing Eats II v2
+#Shelemiah Sotelo_8823190
+
+
+# Menu in a dictionary
+MENU = {
+    "1":{"name":"Pork Sinigang", "price":20}, 
+    "2":{"name":"Chicken Adobo", "price":25}, 
+    "3":{"name":"Pancit Canton", "price":12}, 
+    "4":{"name":"Beef Teriyaki", "price":30}, 
+    "5":{"name":"Chicken Curry", "price":40},
+    "6":{"name":"Pork Teriyaki", "price":36}
+}
+
+# Set currency
+CURRENCY = "$"
+
+# Functions for getting order name and price
+def getOrderName(orderNumber):
+    return MENU.get(orderNumber).get("name")
+def getOrderPrice(orderNumber):
+    return MENU.get(orderNumber).get("price")
+
+
+def custDetails():     # Function for customer details using dictionary
+    customer = {
+        "firstName": "",
+        "lastName": "",
+        "streetNumber": "",
+        "streetName": "",
+        "unitNumber": "",
+        "city": "",
+        "province": "",
+        "postalCode": "",
+        "specialInstructions": "",
+        "phoneNumber": ""
+    }
+    custInfo = "N"
+    while (custInfo.upper() == 'N'):
+
+        customer.update({"firstName":input("Please enter your first name: ").capitalize()}) 
+        customer.update({"lastName":input("Please enter your last name: ").capitalize()}) 
+        customer.update({"streetNumber":input("Enter address:\nStreet number: ")}) 
+        customer.update({"streetName":input("Street Name: ").capitalize()}) 
+        customer.update({"unitNumber":input("Unit if applicable (leave blank if none): ").capitalize()}) 
+        customer.update({"city":input("City: ").capitalize()}) 
+        customer.update({"province":input("Province: ").capitalize()}) 
+        customer.update({"postalCode":input("Postal Code: ").capitalize()}) 
+        customer.update({"specialInstructions":input("Special instructions for deliveries from this address: ").capitalize()}) 
+        customer.update({"phoneNumber":input("Phone number: ")})
+
+        print("\nPlease confirm information\n")
+        print("\nFirst Name: ", customer.get("firstName"))
+        print("Last Name: ", customer.get("lastName"))
+        print("Street Number: ", customer.get("streetNumber"))
+        print("Street Name: ", customer.get("streetName"))
+        print("Unit Number: ", customer.get("unitNumber"))
+        print("City: ", customer.get("city"))
+        print("Province: ", customer.get("province"))
+        print("Postal Code: ", customer.get("postalCode"))
+        print("Special Instructions: ", customer.get("specialInstructions"))
+        print("Phone Number: ", customer.get("phoneNumber"))
+        custInfo = input("Are these correct?: Y/N : ")
+        print("\n")
+    print("Information confirmed!\n")
+    return customer
+
+
+def displayMenu(menu):     # Function to show list of foods available in menu.
+    print("\nMENU:")
+    for item in MENU.items():
+        print(item[0],">>", item[1].get('name'),":", CURRENCY+str(item[1].get('price')) )
+def getOrder():                          # Function to gather customer's order/s
+    orders = []
+    while True:
+        print("\nPick your order from 1-6")
+        currentOrder = input()
+        print("Enter quantity")
+        currentQuantity = int(input())
+        orders.append({"order":currentOrder, "qty":currentQuantity})
+        
+        addOrder = input("\nWould you like to add order? Y/N: ")   # Ask customer if they would like to add more order. 
+        if addOrder.strip().upper()=="Y":
+            continue
+        else:
+            # Show order and quantity
+            print("\nYour Orders")
+            for order in orders:
+                print(getOrderName(order.get("order")) , "x"+str(order.get("qty")))#can also add the price here
+            # Ask confirmation for whole order
+            confirm = input("Please confirm order/s: Y/N :")
+            if confirm.strip().upper()=="Y":
+                # compute total
+                return orders
+            else: #Add validation to not clear. Maybe not add item when it is N
+                # Remove previous order/s.
+                orders = []
+                print("\n")
+                print("Order cleared! Please enter your order again :)")          # We can ask if they want to order again here
+                # Order again.
+                continue
+                
+def computeTotal(orders):                   # Function for computation of total of order/s.
+    total = 0
+    for order in orders:
+        total += getOrderPrice(order.get("order"))*order.get("qty")
+    return total
+
+
+def studentDisc(total):                       # Function for computation of student discount.
+    student = input("Are you a student? Y/N:")
+    if student.strip().upper() == "Y":
+    #compute student discount
+        stuDiscount = total*(0.10)
+        return stuDiscount
+    else:
+        return 0
+
+def withHST(total):                           # Function for computation of tax.
+    HSTax = total*(0.13)
+    return HSTax
+
+def discounts(total):                         # Function for additional discounts for certain amounts.
+    if total < 100:
+        addDisc = total*(.05)
+    elif total >= 100 and total < 500:
+        addDisc = total*(.10)
+    elif total >= 500:
+        addDisc = total*(.15)
+    return addDisc
+
+def receipt(orderDetails):                        # Function for receipt.
+    orders = orderDetails.get("orders")
+    total = orderDetails.get("total")
+    discount = orderDetails.get("addDisc")
+    studentDiscount = orderDetails.get("discountStu")
+    subtotal =  orderDetails.get("subTotal")
+    delivery = orderDetails.get("delivery")
+    tip = orderDetails.get("tip")
+    tax = orderDetails.get("tax")
+    customer = orderDetails.get("customer")
+    print("\n \n*OFFICIAL RECEIPT*\n")
+    print("FOR", orderDetails.get("deliveryOrPickup"),"\n")
+    print("Name:", customer.get("firstName"), customer.get("lastName"))
+    print("Contact Number:", customer.get("phoneNumber"))
+    if orderDetails.get("deliveryOrPickup")=="DELIVERY":
+        print("Address: ", customer.get("streetNumber"),customer.get("streetName"),customer.get("unitNumber"))
+        print("         ", customer.get("city"),",",customer.get("province"),",",customer.get("postalCode"))
+    print("\n")
+    print("                         Item    Item")
+    print("Order                     Qty    Price       Total")
+    print("-------------            ----   ------       --------")
+    for order in orders:
+        print(getOrderName(order.get("order")), "          ", order.get("qty"),"     ",CURRENCY, getOrderPrice(order.get("order")),"       ",CURRENCY,   order.get("qty")*getOrderPrice(order.get("order")))
+    print("Additional discounts:                        ",CURRENCY,"{:.2f}".format(discount))
+    print("10% student savings                          ",CURRENCY,"{:.2f}".format(studentDiscount))
+    print("                                  Sub total: ",CURRENCY,"{:.2f}".format(subtotal))
+    if orderDetails.get("deliveryOrPickup")=="DELIVERY":
+        if subtotal<30:
+            print("                               Delivery Fee: ",CURRENCY,"{:.2f}".format(delivery))
+        else:
+            print("                               Delivery Fee: ","WAIVED")
+        print("                                        Tip: ",CURRENCY,"{:.2f}".format(tip))
+    print("                                  Tax (13%): ",CURRENCY,"{:.2f}".format(tax))
+    print("                                  --------------------")
+    print("                                  TOTAL:     ",CURRENCY,"{:.2f}".format(subtotal+tax+delivery+tip))
+    print("\n")
+    print("Special Instructions: ",  customer.get("specialInstructions"))
+
+def deliveryOrPickup():
+    response = input("Enter 1 for Delivery, 2 for Pickup: ").strip()
+    if response=="1":
+        return "DELIVERY"
+    elif response=="2":
+        return "PICKUP"
+    else:
+        print("invalid.")
+
+def calculateTip(subtotal):
+    tip = int(input("Please enter tip: (10% 15% 20%) *don't include %*: "))
+    return subtotal*tip/100
+
+print("Welcome to Arnold's Amazing East II!")       # Welcome greetings
+
+orderDetails={
+    "customer": {},
+    "orders": {},
+    "total": 0,
+    "subTotal": 0,
+    "addDisc": 0,
+    "discountStu": 0,
+    "tax": 0,
+    "deliveryOrPickup": "delivery",
+    "delivery": 0,
+    "tip": 0
+}
+
+
+customer = custDetails()
+orderDetails.update({"customer": customer})
+
+# Flow
+displayMenu(MENU)
+# # Get orders and quantities
+orders = getOrder() # list of orders(dictionary)
+orderDetails.update({"orders": orders})
+
+# # Compute total
+total = computeTotal(orderDetails["orders"])
+orderDetails.update({"total": total})
+print("Items total:", "{:.2f}".format(total))
+
+#additional discounts #running total
+addDisc = discounts(orderDetails["total"])
+orderDetails.update({"addDisc": addDisc})
+print("Discounted price:", "{:.2f}".format(addDisc))
+
+#for student discount #running total
+discountStu = studentDisc(orderDetails["total"]-orderDetails["addDisc"])
+orderDetails.update({"discountStu": discountStu})
+print("Student discount price:", "{:.2f}".format(discountStu))
+
+orderDetails.update({"subTotal": total-addDisc-discountStu})
+
+#for HST
+hst = withHST(orderDetails["subTotal"])
+orderDetails.update({"tax": hst})
+print("With HST:", "{:.2f}".format(hst))
+
+orderDetails.update({"deliveryOrPickup": deliveryOrPickup()})
+if orderDetails.get("deliveryOrPickup")=="DELIVERY":
+    orderDetails.update({"tip": calculateTip(orderDetails["subTotal"])})
+    if orderDetails.get("subTotal")<30:
+        orderDetails.update({"delivery": 5})
+        
+
+
+
+
+receipt(orderDetails)
