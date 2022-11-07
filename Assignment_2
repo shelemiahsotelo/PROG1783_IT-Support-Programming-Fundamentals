@@ -140,8 +140,9 @@ def receipt(orderDetails):                        # Function for receipt.
     tip = orderDetails.get("tip")
     tax = orderDetails.get("tax")
     customer = orderDetails.get("customer")
-    print("\n \n*OFFICIAL RECEIPT*\n")
-    print("FOR", orderDetails.get("deliveryOrPickup"),"\n")
+    print("\n \n- - - - - - - - - -")
+    print("*OFFICIAL RECEIPT*\n")
+    print("- - FOR", orderDetails.get("deliveryOrPickup")," - -")
     print("Name:", customer.get("firstName"), customer.get("lastName"))
     print("Contact Number:", customer.get("phoneNumber"))
     if orderDetails.get("deliveryOrPickup")=="DELIVERY":
