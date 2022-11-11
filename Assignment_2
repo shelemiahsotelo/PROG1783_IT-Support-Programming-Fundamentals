@@ -66,7 +66,7 @@ def custDetails():     # Function for customer details using dictionary
         customer.update({"unitNumber":validateInputString(" Unit if applicable (leave blank if none): ", 0,25).capitalize()}) 
         customer.update({"city":validateInputString(" City: ",1,25).capitalize()}) 
         customer.update({"province":validateInputString(" Province: ",1,25).capitalize()}) 
-        customer.update({"postalCode":validateInputString(" Postal Code: ",1,15).capitalize()}) 
+        customer.update({"postalCode":validateInputString(" Postal Code: ",1,15).upper()}) 
         customer.update({"specialInstructions":validateInputString("Special instructions for deliveries from this address: ",1,25).capitalize()}) 
         customer.update({"phoneNumber":validateInputString("Phone number: ",7,15)})
 
@@ -176,7 +176,7 @@ def receipt(orderDetails):
     print("Name:", customer.get("firstName"), customer.get("lastName"))
     print("Contact Number:", customer.get("phoneNumber"))
     if orderDetails.get("deliveryOrPickup")=="DELIVERY":
-        print("Address: ", customer.get("streetNumber"),customer.get("streetName"),customer.get("unitNumber"))
+        print("Address: ", customer.get("streetNumber"),customer.get("streetName"),",",customer.get("unitNumber"))
         print("         ", customer.get("city"),",",customer.get("province"),",",customer.get("postalCode"))
     print("\n")
     print("                         Item    Item")
@@ -212,7 +212,7 @@ def deliveryOrPickup():
 
 # Calculates tip base from input%
 def calculateTip(subtotal):
-    tip = int(input("Please enter tip: (10% 15% 20%) *don't include %*: "))
+    tip = int(input("Please enter tip: (0, 10%, 15%, 20%) *don't include %*: "))
     return subtotal*tip/100
 
 # Welcome greetings
