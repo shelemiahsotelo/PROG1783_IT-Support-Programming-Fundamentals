@@ -2,8 +2,6 @@
 #Arnold's Amazing Eats II v2
 #Shelemiah Sotelo_8823190
 
-
-# Menu in a dictionary
 MENU = {
     "1":{"name":"Pork Sinigang", "price":20}, 
     "2":{"name":"Chicken Adobo", "price":25}, 
@@ -13,15 +11,36 @@ MENU = {
     "6":{"name":"Pork Teriyaki", "price":36}
 }
 
-# Set currency
 CURRENCY = "$"
 
-# Functions for getting order name and price
+# Function to get order name base from order number
 def getOrderName(orderNumber):
     return MENU.get(orderNumber).get("name")
+
+# Function to get order price base from order number
 def getOrderPrice(orderNumber):
     return MENU.get(orderNumber).get("price")
 
+# Function to get input and validate if the input is within min and max length. Returns input
+def validateInputString(message ,minLen, maxLen):
+    inputString = ""
+    while True:
+        inputString = input(message)
+        inputStringLen = len(inputString)
+        if inputStringLen >= minLen and inputStringLen <= maxLen:
+            break
+        continue
+    return inputString
+
+# Function to validate input numbers based from the given min and max values
+def validateInputNumber(message, min, max):
+    inputNum = 0
+    while True:
+        inputNum = input(message).strip()
+        if int(inputNum) >= min and int(inputNum) <= max:
+            break
+        continue
+    return inputNum
 
 def custDetails():     # Function for customer details using dictionary
     customer = {
@@ -39,48 +58,56 @@ def custDetails():     # Function for customer details using dictionary
     custInfo = "N"
     while (custInfo.upper() == 'N'):
 
-        customer.update({"firstName":input("Please enter your first name: ").capitalize()}) 
-        customer.update({"lastName":input("Please enter your last name: ").capitalize()}) 
-        customer.update({"streetNumber":input("Enter address:\nStreet number: ")}) 
-        customer.update({"streetName":input("Street Name: ").capitalize()}) 
-        customer.update({"unitNumber":input("Unit if applicable (leave blank if none): ").capitalize()}) 
-        customer.update({"city":input("City: ").capitalize()}) 
-        customer.update({"province":input("Province: ").capitalize()}) 
-        customer.update({"postalCode":input("Postal Code: ").capitalize()}) 
-        customer.update({"specialInstructions":input("Special instructions for deliveries from this address: ").capitalize()}) 
-        customer.update({"phoneNumber":input("Phone number: ")})
+        customer.update({"firstName":validateInputString("Please enter your first name: ",1,15).capitalize()}) 
+        customer.update({"lastName":validateInputString("Please enter your last name: ",1,15).capitalize()}) 
+        print("Enter address")
+        customer.update({"streetNumber":validateInputString(" Street number: ",1,15)}) 
+        customer.update({"streetName":validateInputString(" Street Name: ",1,25).capitalize()}) 
+        customer.update({"unitNumber":validateInputString(" Unit if applicable (leave blank if none): ", 0,25).capitalize()}) 
+        customer.update({"city":validateInputString(" City: ",1,25).capitalize()}) 
+        customer.update({"province":validateInputString(" Province: ",1,25).capitalize()}) 
+        customer.update({"postalCode":validateInputString(" Postal Code: ",1,15).capitalize()}) 
+        customer.update({"specialInstructions":validateInputString("Special instructions for deliveries from this address: ",1,25).capitalize()}) 
+        customer.update({"phoneNumber":validateInputString("Phone number: ",7,15)})
 
-        print("\nPlease confirm information\n")
-        print("\nFirst Name: ", customer.get("firstName"))
-        print("Last Name: ", customer.get("lastName"))
-        print("Street Number: ", customer.get("streetNumber"))
-        print("Street Name: ", customer.get("streetName"))
-        print("Unit Number: ", customer.get("unitNumber"))
-        print("City: ", customer.get("city"))
-        print("Province: ", customer.get("province"))
-        print("Postal Code: ", customer.get("postalCode"))
-        print("Special Instructions: ", customer.get("specialInstructions"))
-        print("Phone Number: ", customer.get("phoneNumber"))
-        custInfo = input("Are these correct?: Y/N : ")
-        print("\n")
+        print("\nPlease confirm information:\n")
+        for details in customer.items():
+            print("\nFirst Name: ", customer.get("firstName"))
+            print("Last Name: ", customer.get("lastName"))
+            print("Street Number: ", customer.get("streetNumber"))
+            print("Street Name: ", customer.get("streetName"))
+            print("Unit Number: ", customer.get("unitNumber"))
+            print("City: ", customer.get("city"))
+            print("Province: ", customer.get("province"))
+            print("Postal Code: ", customer.get("postalCode"))
+            print("Special Instructions: ", customer.get("specialInstructions"))
+            print("Phone Number: ", customer.get("phoneNumber"))
+
+        while custInfo.strip().upper() != 'Y':
+            custInfo = input("Are these correct?: Y/N : ")
+            if custInfo.strip().upper() == 'N':
+                break
+
     print("Information confirmed!\n")
     return customer
 
-
-def displayMenu(menu):     # Function to show list of foods available in menu.
+# Function to show list of foods available in menu.
+def displayMenu(menu):     
     print("\nMENU:")
     for item in MENU.items():
         print(item[0],">>", item[1].get('name'),":", CURRENCY+str(item[1].get('price')) )
-def getOrder():                          # Function to gather customer's order/s
+
+# Function to gather customer's order/s
+def getOrder():                          
     orders = []
     while True:
-        print("\nPick your order from 1-6")
-        currentOrder = input()
+        print("\n")
+        currentOrder = validateInputNumber("Pick your order from 1-"+str(len(MENU))+":\n", 1, len(MENU))
         print("Enter quantity")
         currentQuantity = int(input())
         orders.append({"order":currentOrder, "qty":currentQuantity})
         
-        addOrder = input("\nWould you like to add order? Y/N: ")   # Ask customer if they would like to add more order. 
+        addOrder = input("\nWould you like to add order? Y/N: ")
         if addOrder.strip().upper()=="Y":
             continue
         else:
@@ -89,27 +116,28 @@ def getOrder():                          # Function to gather customer's order/s
             for order in orders:
                 print(getOrderName(order.get("order")) , "x"+str(order.get("qty")))#can also add the price here
             # Ask confirmation for whole order
-            confirm = input("Please confirm order/s: Y/N :")
+            confirm = input("\nPlease confirm order/s: Y/N: ")
             if confirm.strip().upper()=="Y":
                 # compute total
                 return orders
-            else: #Add validation to not clear. Maybe not add item when it is N
+            else: # Add validation to not clear. Maybe not add item when it is N
                 # Remove previous order/s.
                 orders = []
                 print("\n")
-                print("Order cleared! Please enter your order again :)")          # We can ask if they want to order again here
+                print("Order cleared! Please enter your order again :)")#We can ask if they want to order again here
                 # Order again.
                 continue
-                
-def computeTotal(orders):                   # Function for computation of total of order/s.
+
+# Function for computation of total of order/s.             
+def computeTotal(orders):         
     total = 0
     for order in orders:
         total += getOrderPrice(order.get("order"))*order.get("qty")
     return total
 
-
-def studentDisc(total):                       # Function for computation of student discount.
-    student = input("Are you a student? Y/N:")
+# Function for computation of student discount.
+def studentDisc(total):                       
+    student = input("Are you a student? Y/N: ")
     if student.strip().upper() == "Y":
     #compute student discount
         stuDiscount = total*(0.10)
@@ -117,11 +145,13 @@ def studentDisc(total):                       # Function for computation of stud
     else:
         return 0
 
-def withHST(total):                           # Function for computation of tax.
+# Function for computation of tax.
+def withHST(total):                           
     HSTax = total*(0.13)
     return HSTax
 
-def discounts(total):                         # Function for additional discounts for certain amounts.
+# Function for additional discounts for certain amounts.
+def discounts(total):                         
     if total < 100:
         addDisc = total*(.05)
     elif total >= 100 and total < 500:
@@ -130,7 +160,8 @@ def discounts(total):                         # Function for additional discount
         addDisc = total*(.15)
     return addDisc
 
-def receipt(orderDetails):                        # Function for receipt.
+# Function for receipt.
+def receipt(orderDetails):
     orders = orderDetails.get("orders")
     total = orderDetails.get("total")
     discount = orderDetails.get("addDisc")
@@ -140,9 +171,8 @@ def receipt(orderDetails):                        # Function for receipt.
     tip = orderDetails.get("tip")
     tax = orderDetails.get("tax")
     customer = orderDetails.get("customer")
-    print("\n \n- - - - - - - - - -")
-    print("*OFFICIAL RECEIPT*\n")
-    print("- - FOR", orderDetails.get("deliveryOrPickup")," - -")
+    print("\n \n*OFFICIAL RECEIPT*\n")
+    print("FOR", orderDetails.get("deliveryOrPickup"),"\n")
     print("Name:", customer.get("firstName"), customer.get("lastName"))
     print("Contact Number:", customer.get("phoneNumber"))
     if orderDetails.get("deliveryOrPickup")=="DELIVERY":
@@ -168,7 +198,9 @@ def receipt(orderDetails):                        # Function for receipt.
     print("                                  TOTAL:     ",CURRENCY,"{:.2f}".format(subtotal+tax+delivery+tip))
     print("\n")
     print("Special Instructions: ",  customer.get("specialInstructions"))
+    print("\n")
 
+# Function to ask if order is for delivery or pickup (1/2)
 def deliveryOrPickup():
     response = input("Enter 1 for Delivery, 2 for Pickup: ").strip()
     if response=="1":
@@ -178,12 +210,15 @@ def deliveryOrPickup():
     else:
         print("invalid.")
 
+# Calculates tip base from input%
 def calculateTip(subtotal):
     tip = int(input("Please enter tip: (10% 15% 20%) *don't include %*: "))
     return subtotal*tip/100
 
-print("Welcome to Arnold's Amazing East II!")       # Welcome greetings
+# Welcome greetings
+print("Welcome to Arnold's Amazing East II!")
 
+# Creating a dictionary for all the details regarding order
 orderDetails={
     "customer": {},
     "orders": {},
@@ -197,7 +232,6 @@ orderDetails={
     "tip": 0
 }
 
-
 customer = custDetails()
 orderDetails.update({"customer": customer})
 
@@ -210,17 +244,17 @@ orderDetails.update({"orders": orders})
 # # Compute total
 total = computeTotal(orderDetails["orders"])
 orderDetails.update({"total": total})
-print("Items total:", "{:.2f}".format(total))
+print("\nItems total:", "{:.2f}".format(total))
 
 #additional discounts #running total
 addDisc = discounts(orderDetails["total"])
 orderDetails.update({"addDisc": addDisc})
-print("Discounted price:", "{:.2f}".format(addDisc))
+print("Discount:", "{:.2f}".format(addDisc))
 
 #for student discount #running total
 discountStu = studentDisc(orderDetails["total"]-orderDetails["addDisc"])
 orderDetails.update({"discountStu": discountStu})
-print("Student discount price:", "{:.2f}".format(discountStu))
+print("Student discount price: ", "{:.2f}".format(discountStu))
 
 orderDetails.update({"subTotal": total-addDisc-discountStu})
 
@@ -235,8 +269,5 @@ if orderDetails.get("deliveryOrPickup")=="DELIVERY":
     if orderDetails.get("subTotal")<30:
         orderDetails.update({"delivery": 5})
         
-
-
-
-
 receipt(orderDetails)
+
