@@ -2,14 +2,16 @@
 import random
 
 # Class to easily create a question object
-# Class is name "Uimun" which is a korean word that translates to "Question" in English
-class Uimun:
+
+class Quiz:
   def __init__(self, question, choices, answer):
     self.question = question
     self.choices = choices.split(',')
     # Randomizing the choices
     random.shuffle(self.choices)
-    self.answer = answer
+
+    # Searches for the index of correct answer from the choices
+    self.answer = self.choices.index(answer.strip())
 
 # TODO: Print welcome message for the quiz
 print("\nWelcome to BTS quiz show\n")
@@ -17,7 +19,8 @@ print("\nWelcome to BTS quiz show\n")
 # TODO: Print the instruction
 print("Choose correct answer. Blah blah\n")
 
-questions = []
+List_of_Questions = []
+choice_letters = ['a', 'b', 'c', 'd', 'e']
 
 # Open question bank
 # We can specify the directory if we want
@@ -26,10 +29,15 @@ with open(BTS_Quiz_bank, 'r') as file:
   # Read each line. One line contains one question with its choices and answer
   for line in file:
     object= line.split('?')
-    questions.append(Uimun(object[0],object[1],object[2]))
+    List_of_Questions.append(Quiz(object[0],object[1],object[2]))
 
   # close the file
   file.close()
 
+# Also randomize the questions
+random.shuffle(List_of_Questions)
 
-print(questions[0].choices)
+for id,item in enumerate(List_of_Questions):
+  print(str(id) +item.question)
+  for choice_id, choice in enumerate(item.choices):
+    print(str(choice_id), choice)
