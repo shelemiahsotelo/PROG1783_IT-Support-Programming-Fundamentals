@@ -149,10 +149,6 @@ def start_timer(timer):
     time.sleep(1)
   sys.stdout.write("\rStart!                    \n")
 
-def check_end_list(id, inputlist):
-  if (id+1) == len(inputlist):
-    print("Sorry no more questions from question bank. More questions soon")
-
 ####################### End of Classes/Functions #######################
 
 
