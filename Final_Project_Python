@@ -20,6 +20,8 @@ settings = {
 }
 
 ####################### Start of Classes/Functions #######################
+
+# Class to be used to change color on console
 class colors:
   WHITE = "\u001b[37m"
   GREEN = "\033[92m"
@@ -73,6 +75,10 @@ class Quiz:
       
     except:
       print("There is an issue with the question bank .txt file. Please contact programmer to fix")
+
+  # Method to display question to console
+  def show_question(self, id):
+    print("\n{}) {}".format(str(id+1), self.question))
 
   # Method to display choices to console
   def show_choices(self):
@@ -155,11 +161,26 @@ def start_timer(timer):
 
 ########################### Start of flow ###########################
 
+# TODO: Explain
+print(colors.PURPLE)                 
+print("     ____ _____ ____          ")
+print("    | __ )_   _/ ___|   |\  /|")
+print("    |  _ \ | | \___ \   | || |")
+print("    | |_) || |  ___) |  | || |")
+print("    |____/ |_| |____/   |/  \|")
+print(colors.WHITE)
+
+# TODO: Can implement a login here. Last priority
+
 # TODO: Print welcome message for the quiz
 print("\nWelcome to BTS quiz show\n")
 
 # TODO: Print the instruction
 print("Choose correct answer. Blah blah Explain scoring here\n")
+
+# TODO: Create code here to ask user for the mode. Modes implemented
+
+# TODO: Add code here to ask for difficulty. If difficulty is already implemented
 
 # TODO: What does this variables do?
 List_of_Questions = []
@@ -185,15 +206,6 @@ with open(BTS_Quiz_bank, 'r') as file:
 # Also randomize the questions
 random.shuffle(List_of_Questions)
 
-# TODO: Explain
-print(colors.PURPLE)                 
-print("   ____ _____ ____          ")
-print("  | __ )_   _/ ___|   |\  /|")
-print("  |  _ \ | | \___ \   | || |")
-print("  | |_) || |  ___) |  | || |")
-print("  |____/ |_| |____/   |/  \|")
-print(colors.WHITE)
-
 #Start Timer
 start_timer(5)
 
@@ -201,8 +213,8 @@ start_timer(5)
 if settings["mode"] == CLASSIC:
   for id in range(0, settings["number_of_questions"]):
     item = List_of_Questions[id]
-    # Print question with item number
-    print("\n{}) {}".format(str(id+1), item.question))
+
+    item.show_question(id)
     item.show_choices()
     
     result = item.score_answer()
@@ -226,8 +238,8 @@ elif settings["mode"] == TIME_ATTACK:
       break
 
     item = List_of_Questions[id]
-    # Print question with item number
-    print("\n{}) {}".format(str(id+1), item.question))
+
+    item.show_question(id)
     item.show_choices()
 
     result = item.score_answer()
@@ -254,8 +266,8 @@ elif settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
       break
 
     item = List_of_Questions[id]
-    # Print question with item number
-    print("\n{}) {}".format(str(id+1), item.question))
+
+    item.show_question(id)
     item.show_choices()
 
     result = item.score_answer()
@@ -272,7 +284,7 @@ elif settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
 
 print("\n", end="")
 
-# TODO: Explain
+# TODO: Make a code to display score based from what you want
 for key in user:
   print(user[key])
 
