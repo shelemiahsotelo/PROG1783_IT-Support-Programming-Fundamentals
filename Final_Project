@@ -1,0 +1,147 @@
+# imports
+import random
+import time
+import sys
+
+# Constants
+CLASSIC = "classic"
+TIME_ATTACK = "time-attack"
+LIFELINE = "lifeline"
+SUDDEN_DEATH = "sudden_death"
+
+# TODO: Add explanation of each mode and settings
+# Settings to be used inside game. 7 questions to represent BTS members
+settings = {
+  "number_of_questions": 7,
+  "timer": 10,
+  "mode": CLASSIC, # classic, time-attack, lifeline, sudden_death
+  "time-attack": 60, # sample time of 1 minute
+  "choice": "numbers" # letters or numbers
+}
+
+####################### Start of Classes/Functions #######################
+
+# Class to be used to change color on console
+class colors:
+  WHITE = "\u001b[37m"
+  GREEN = "\033[92m"
+  RED = "\033[91m"
+  PURPLE = "\033[0;35m"
+
+# Class to easily create a question object
+class Quiz:
+  # For creating instance of quiz class
+  def __init__(self, list):
+    try:
+      self.question = list[0]
+
+      # Limited to 5 choices only
+      self.choice_map = ['a', 'b', 'c', 'd', 'e']
+      self.choices = list[1].split(',')
+
+      # Check if there is a choice that always needs to be at the bottom
+      self._aoda = "all of the above"
+      self._noda = "none of the above"
+
+      try:
+        self._aoda_index = self.choices.index(self._aoda)
+      except ValueError:
+        self._aoda_index = -1
+      # Remove AODA or NODA before shuffle
+      if self._aoda_index>=0:
+        self.choices.pop(self._aoda_index)
+
+      try:
+        self._noda_index = self.choices.index(self._noda)
+      except ValueError:
+        self._noda_index = -1
+      if self._noda_index>=0:
+        self.choices.pop(self._noda_index)
+
+      # Randomizing the choices
+      random.shuffle(self.choices)
+
+      # Put AODA or NODA at the bottom
+      if self._aoda_index>=0:
+        self.choices.append(self._aoda)
+      if self._noda_index>=0:
+        self.choices.append(self._noda)
+
+
+      # Searches for the index of correct answer from the choices
+      self.answer = self.choices.index(list[2].strip())
+
+      self.read_time = int(list[3])
+      
+    except:
+      print("There is an issue with the question bank .txt file. Please contact programmer to fix")
+
+  # Method to display question to console
+  def show_question(self, id):
+    print("\n{}) {}".format(str(id+1), self.question))
+
+  # Method to display choices to console
+  def show_choices(self):
+    if settings["choice"].lower() == "letters":
+      for choice_id, choice in enumerate(self.choices):
+        print("   {}. {}".format(self.choice_map[choice_id], choice))
+    elif settings["choice"].lower() == "numbers":
+      for choice_id, choice in enumerate(self.choices):
+        print("   {}. {}".format(choice_id+1, choice))
+  
+  # Method to get answer from user and return correct or not
+  def score_answer(self):
+    before = time.time()
+
+    while True:
+      ans = input("Your answer: ")
+      ans = ans.strip()
+      after = time.time()
+      # Time elapsed to answer the question
+      anstime = after - before
+
+      if settings["choice"].lower() == "letters":
+        try:
+          if self.choice_map.index(ans.strip().lower())==self.answer:
+            print("{}Correct!{}".format(colors.GREEN, colors.WHITE))
+            return self.calc_score(anstime)
+          else:
+            print("{}Wrong{}".format(colors.RED, colors.WHITE))
+            # No score for wrong answers
+            return [0, anstime]
+        except ValueError:
+          # TODO: Fix error message when choice is not available
+          print('Choose from a-{} only'.format(self.choice_map[len(self.choices)-1]))
+          continue
+
+      elif settings["choice"].lower() == "numbers":
+        try:
+          if int(ans)==(self.answer+1):
+            print("{}Correct!{}".format(colors.GREEN, colors.WHITE))
+            return self.calc_score(anstime)
+          elif int(ans) > len(self.choices) or int(ans) < 1:
+            raise ValueError("Choose from 1-{} only".format(len(self.choices)))
+          else:
+            print("{}Wrong{}".format(colors.RED, colors.WHITE))
+            # No score for wrong answers
+            return [0, anstime]
+        except ValueError:
+          print('Enter integers from 1-{} only'.format(len(self.choices)))
+          continue
+
+  # TODO: Add comments
+  def calc_score(self, anstime):
+    # TODO: Add comments
+    if settings["mode"]==CLASSIC:
+      real_time = anstime - self.read_time
+      if real_time < 0:
+        real_time = 0
+      remaining = settings["timer"] - real_time
+
+      max_score_per_question = 100/settings["number_of_questions"]
+      # TODO: This can become negative. Either have a setting to control if this will allow negatives
+      return [max_score_per_question*(remaining/settings["timer"]), anstime]
+
+    elif settings["mode"] == TIME_ATTACK or settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
+      return [1, anstime]
+
