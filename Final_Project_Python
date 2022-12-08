@@ -144,10 +144,14 @@ class Quiz:
 def start_timer(timer):
   for remaining in range(timer, 0, -1):
     sys.stdout.write("\r")
-    sys.stdout.write("Starting in {:2d} seconds.".format(remaining)) 
+    sys.stdout.write("The quiz begins in {:2d}".format(remaining)) 
     sys.stdout.flush()
     time.sleep(1)
   sys.stdout.write("\rStart!                    \n")
+
+def check_end_list(id, inputlist):
+  if (id+1) == len(inputlist):
+    print("Sorry no more questions from question bank. More questions soon")
 
 ####################### End of Classes/Functions #######################
 
@@ -195,7 +199,7 @@ print("  |____/ |_| |____/   |/  \|")
 print(colors.WHITE)
 
 #Start Timer
-# start_timer(10)
+start_timer(5)
 
 # TODO: Explain
 if settings["mode"] == CLASSIC:
@@ -220,6 +224,11 @@ elif settings["mode"] == TIME_ATTACK:
 
   # TODO: Explain while loop
   while time.time() - start_time < settings["time-attack"]:
+
+    if (id+1) == len(List_of_Questions):
+      print("Sorry no more questions from question bank. More questions soon")
+      break
+
     item = List_of_Questions[id]
     # Print question with item number
     print("\n{}) {}".format(str(id+1), item.question))
@@ -243,6 +252,11 @@ elif settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
 
   # TODO: Explain while loop
   while user["lives"] > 0:
+
+    if (id+1) == len(List_of_Questions):
+      print("Sorry no more questions from question bank. More questions soon")
+      break
+
     item = List_of_Questions[id]
     # Print question with item number
     print("\n{}) {}".format(str(id+1), item.question))
