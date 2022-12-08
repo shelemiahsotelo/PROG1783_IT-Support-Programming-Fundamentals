@@ -1,26 +1,108 @@
 # imports
 import random
+import time
+import sys
 
+# Settings to be used inside game. 7 questions to represent BTS members
+settings = {
+  "number_of_questions": 7,
+  "timer": 10,
+}
+
+####################### Start of Classes/Functions #######################
+class colors:
+  WHITE = "\u001b[37m"
+  GREEN = "\033[92m"
+  RED = "\033[91m"
+  PURPLE = "\033[0;35m"
 # Class to easily create a question object
-
 class Quiz:
-  def __init__(self, question, choices, answer):
-    self.question = question
-    self.choices = choices.split(',')
-    # Randomizing the choices
-    random.shuffle(self.choices)
 
-    # Searches for the index of correct answer from the choices
-    self.answer = self.choices.index(answer.strip())
+  # For creating instance of quiz class
+  def __init__(self, list):
+    try:
+      self.question = list[0]
+      self.choices = list[1].split(',')
+      # Randomizing the choices
+      random.shuffle(self.choices)
+
+      # Searches for the index of correct answer from the choices
+      self.answer = self.choices.index(list[2].strip())
+      # Limited to 5 choices only
+      self.choice_map = ['a', 'b', 'c', 'd', 'e']
+
+      self.read_time = int(list[3])
+    except:
+      print("There is an issue with the question bank .txt file. Please contact programmer to fix")
+
+  # Method to display choices to console
+  def show_choices(self):
+    for choice_id, choice in enumerate(self.choices):
+      print("   {}. {}".format(self.choice_map[choice_id], choice))
+  
+  # Put a timer in console # TODO: Add self.time from file so time will be different per question
+  def start_timer(self):
+    for remaining in range(10, 0, -1):
+      sys.stdout.write("\r")
+      sys.stdout.write("{:2d} seconds remaining.".format(remaining)) 
+      sys.stdout.flush()
+      time.sleep(1)
+
+    sys.stdout.write("\rComplete!            \n")
+
+  # Method to get answer from user and return correct or not
+  def score_answer(self):
+    before = time.time()
+
+    while True:
+      try:
+        ans = input("Your answer: ")
+        after = time.time()
+        # Time elapsed to answer the question
+        anstime = after - before
+        if self.choice_map.index(ans.strip().lower())==self.answer:
+          print("{}Correct!{}".format(colors.GREEN, colors.WHITE))
+          return self.calc_score(anstime)
+        else:
+          print("{}Wrong{}".format(colors.RED, colors.WHITE))
+          # No score for wrong answers
+          return [0, anstime]
+      except:
+        # TODO: Fix error message when choice is not available
+        print('Choose from a-{} only'.format(self.choice_map[len(self.choices)-1]))
+        continue
+
+  # TODO: Add comments
+  def calc_score(self, anstime):
+    # TODO: Add comments
+
+    real_time = anstime - self.read_time
+    if real_time < 0:
+      real_time = 0
+    remaining = settings["timer"] - real_time
+
+    max_score_per_question = 100/settings["number_of_questions"]
+
+    return [max_score_per_question*(remaining/settings["timer"]), anstime]
+
+
+####################### End of Classes/Functions #######################
+
+########################### Start of flow ###########################
 
 # TODO: Print welcome message for the quiz
 print("\nWelcome to BTS quiz show\n")
 
 # TODO: Print the instruction
-print("Choose correct answer. Blah blah\n")
+print("Choose correct answer. Blah blah Explain scoring here\n")
 
 List_of_Questions = []
-choice_letters = ['a', 'b', 'c', 'd', 'e']
+user = {
+  "username": "Ronnie",
+  "score": 0,
+  "times": []
+}
+
 
 # Open question bank
 # We can specify the directory if we want
@@ -28,8 +110,8 @@ BTS_Quiz_bank = "BTS_Quiz_bank.txt"
 with open(BTS_Quiz_bank, 'r') as file:
   # Read each line. One line contains one question with its choices and answer
   for line in file:
-    object= line.split('?')
-    List_of_Questions.append(Quiz(object[0],object[1],object[2]))
+    object= line.split('? ')
+    List_of_Questions.append(Quiz(object))
 
   # close the file
   file.close()
@@ -37,7 +119,15 @@ with open(BTS_Quiz_bank, 'r') as file:
 # Also randomize the questions
 random.shuffle(List_of_Questions)
 
-for id,item in enumerate(List_of_Questions):
-  print(str(id) +item.question)
-  for choice_id, choice in enumerate(item.choices):
-    print(str(choice_id), choice)
+for id in range(0, settings["number_of_questions"]):
+  item = List_of_Questions[id]
+  # Print question with item number
+  print("\n{}) {}".format(str(id+1), item.question))
+  item.show_choices()
+  
+  result = item.score_answer()
+  user["score"] = user["score"]+result[0]
+  user["times"].append(result[1])
+
+for key in user:
+  print(user[key])
