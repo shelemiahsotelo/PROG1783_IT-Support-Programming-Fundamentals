@@ -1,12 +1,21 @@
 # imports
 import random
 
+# Class to easily create a question object
+# Class is name "Uimun" which is a korean word that translates to "Question" in English
+class Uimun:
+  def __init__(self, question, choices, answer):
+    self.question = question
+    self.choices = choices.split(',')
+    # Randomizing the choices
+    random.shuffle(self.choices)
+    self.answer = answer
 
 # TODO: Print welcome message for the quiz
 print("\nWelcome to BTS quiz show\n")
 
 # TODO: Print the instruction
-print("Please choose the correct answer.\n")
+print("Choose correct answer. Blah blah\n")
 
 questions = []
 
@@ -17,6 +26,10 @@ with open(BTS_Quiz_bank, 'r') as file:
   # Read each line. One line contains one question with its choices and answer
   for line in file:
     object= line.split('?')
+    questions.append(Uimun(object[0],object[1],object[2]))
 
   # close the file
   file.close()
+
+
+print(questions[0].choices)
