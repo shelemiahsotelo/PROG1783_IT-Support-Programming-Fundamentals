@@ -3,12 +3,20 @@ import random
 import time
 import sys
 
+# Constants
+CLASSIC = "classic"
+TIME_ATTACK = "time-attack"
+LIFELINE = "lifeline"
+SUDDEN_DEATH = "sudden_death"
+
+# TODO: Add explanation of each mode and settings
 # Settings to be used inside game. 7 questions to represent BTS members
 settings = {
   "number_of_questions": 7,
   "timer": 10,
-  "mode": "classic",
-  "choice": "letters" # letters or numbers
+  "mode": CLASSIC, # classic, time-attack, lifeline, sudden_death
+  "time-attack": 60, # sample time of 1 minute
+  "choice": "numbers" # letters or numbers
 }
 
 ####################### Start of Classes/Functions #######################
@@ -17,6 +25,7 @@ class colors:
   GREEN = "\033[92m"
   RED = "\033[91m"
   PURPLE = "\033[0;35m"
+
 # Class to easily create a question object
 class Quiz:
   # For creating instance of quiz class
@@ -80,6 +89,7 @@ class Quiz:
 
     while True:
       ans = input("Your answer: ")
+      ans = ans.strip()
       after = time.time()
       # Time elapsed to answer the question
       anstime = after - before
@@ -99,26 +109,35 @@ class Quiz:
           continue
 
       elif settings["choice"].lower() == "numbers":
-        if int(ans)==(self.answer+1):
-          print("{}Correct!{}".format(colors.GREEN, colors.WHITE))
-          return self.calc_score(anstime)
-        else:
-          print("{}Wrong{}".format(colors.RED, colors.WHITE))
-          # No score for wrong answers
-          return [0, anstime]
+        try:
+          if int(ans)==(self.answer+1):
+            print("{}Correct!{}".format(colors.GREEN, colors.WHITE))
+            return self.calc_score(anstime)
+          elif int(ans) > len(self.choices) or int(ans) < 1:
+            raise ValueError("Choose from 1-{} only".format(len(self.choices)))
+          else:
+            print("{}Wrong{}".format(colors.RED, colors.WHITE))
+            # No score for wrong answers
+            return [0, anstime]
+        except ValueError:
+          print('Enter integers from 1-{} only'.format(len(self.choices)))
+          continue
 
   # TODO: Add comments
   def calc_score(self, anstime):
     # TODO: Add comments
+    if settings["mode"]==CLASSIC:
+      real_time = anstime - self.read_time
+      if real_time < 0:
+        real_time = 0
+      remaining = settings["timer"] - real_time
 
-    real_time = anstime - self.read_time
-    if real_time < 0:
-      real_time = 0
-    remaining = settings["timer"] - real_time
+      max_score_per_question = 100/settings["number_of_questions"]
+      # TODO: This can become negative. Either have a setting to control if this will allow negatives
+      return [max_score_per_question*(remaining/settings["timer"]), anstime]
 
-    max_score_per_question = 100/settings["number_of_questions"]
-    # TODO: This can become negative. Either have a setting to control if this will allow negatives
-    return [max_score_per_question*(remaining/settings["timer"]), anstime]
+    elif settings["mode"] == TIME_ATTACK or settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
+      return [1, anstime]
 
  
 # Put a timer in console
@@ -132,6 +151,8 @@ def start_timer(timer):
 
 ####################### End of Classes/Functions #######################
 
+
+
 ########################### Start of flow ###########################
 
 # TODO: Print welcome message for the quiz
@@ -140,13 +161,14 @@ print("\nWelcome to BTS quiz show\n")
 # TODO: Print the instruction
 print("Choose correct answer. Blah blah Explain scoring here\n")
 
+# TODO: What does this variables do?
 List_of_Questions = []
 user = {
   "username": "Ronnie",
   "score": 0,
-  "times": []
+  "times": [],
+  "lives": 5
 }
-
 
 # Open question bank
 # We can specify the directory if we want
@@ -163,8 +185,9 @@ with open(BTS_Quiz_bank, 'r') as file:
 # Also randomize the questions
 random.shuffle(List_of_Questions)
 
+# TODO: Explain
 print(colors.PURPLE)                 
-print("   ____ _____ ____ ")
+print("   ____ _____ ____          ")
 print("  | __ )_   _/ ___|   |\  /|")
 print("  |  _ \ | | \___ \   | || |")
 print("  | |_) || |  ___) |  | || |")
@@ -174,19 +197,74 @@ print(colors.WHITE)
 #Start Timer
 # start_timer(10)
 
-for id in range(0, settings["number_of_questions"]):
-  item = List_of_Questions[id]
-  # Print question with item number
-  print("\n{}) {}".format(str(id+1), item.question))
-  item.show_choices()
-  
-  result = item.score_answer()
-  print(result[0])
-  user["score"] = user["score"]+result[0]
-  user["times"].append(result[1])
+# TODO: Explain
+if settings["mode"] == CLASSIC:
+  for id in range(0, settings["number_of_questions"]):
+    item = List_of_Questions[id]
+    # Print question with item number
+    print("\n{}) {}".format(str(id+1), item.question))
+    item.show_choices()
+    
+    result = item.score_answer()
+
+    # TODO: temporary print
+    print(result[0])
+
+    user["score"] = user["score"]+result[0]
+    user["times"].append(result[1])
+
+# TODO: Explain
+elif settings["mode"] == TIME_ATTACK:
+  start_time = time.time()
+  id = 0
+
+  # TODO: Explain while loop
+  while time.time() - start_time < settings["time-attack"]:
+    item = List_of_Questions[id]
+    # Print question with item number
+    print("\n{}) {}".format(str(id+1), item.question))
+    item.show_choices()
+
+    result = item.score_answer()
+    # TODO: temporary print
+    print(result[0])
+
+    user["score"] = user["score"]+result[0]
+    user["times"].append(result[1])
+    id += 1
+
+elif settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
+
+  # Only 1 life for sudden death
+  if settings["mode"] == SUDDEN_DEATH:
+    user["lives"] = 1
+
+  id = 0
+
+  # TODO: Explain while loop
+  while user["lives"] > 0:
+    item = List_of_Questions[id]
+    # Print question with item number
+    print("\n{}) {}".format(str(id+1), item.question))
+    item.show_choices()
+
+    result = item.score_answer()
+    # TODO: temporary print
+    print(result[0])
+
+    if(result[0]) == 0:
+      user["lives"] -= 1
+
+    user["score"] = user["score"]+result[0]
+    user["times"].append(result[1])
+    id += 1
+
 
 print("\n", end="")
+
+# TODO: Explain
 for key in user:
   print(user[key])
 
+# TODO: Delete. This is just a sample code to compute for total time 
 print(sum(user["times"]))
