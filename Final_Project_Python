@@ -1,0 +1,22 @@
+# imports
+import random
+
+
+# TODO: Print welcome message for the quiz
+print("\nWelcome to BTS quiz show\n")
+
+# TODO: Print the instruction
+print("Please choose the correct answer.\n")
+
+questions = []
+
+# Open question bank
+# We can specify the directory if we want
+BTS_Quiz_bank = "BTS_Quiz_bank.txt"
+with open(BTS_Quiz_bank, 'r') as file:
+  # Read each line. One line contains one question with its choices and answer
+  for line in file:
+    object= line.split('?')
+
+  # close the file
+  file.close()
