@@ -1,3 +1,9 @@
+#FINAL PROJECT
+#Shelemiah Sotelo
+#8823190
+#December2022
+
+
 # imports
 import random
 import time
@@ -9,7 +15,11 @@ TIME_ATTACK = "time-attack"
 LIFELINE = "lifeline"
 SUDDEN_DEATH = "sudden_death"
 
-# TODO: Add explanation of each mode and settings
+# Modes:
+# Classic - 7 questions will be scored based on the time answered
+# Time-attack - timer will be set, how many questions player can answer within the given time 
+# Lifeline - player has 5 tries
+# Sudden_death - one try only
 # Settings to be used inside game. 7 questions to represent BTS members
 settings = {
   "number_of_questions": 7,
@@ -129,7 +139,7 @@ class Quiz:
           print('Enter integers from 1-{} only'.format(len(self.choices)))
           continue
 
-  # TODO: Add comments
+  # Function for calculating score
   def calc_score(self, anstime):
     # TODO: Add comments
     if settings["mode"]==CLASSIC:
@@ -139,7 +149,7 @@ class Quiz:
       remaining = settings["timer"] - real_time
 
       max_score_per_question = 100/settings["number_of_questions"]
-      # TODO: This can become negative. Either have a setting to control if this will allow negatives
+      # This can become negative. Either have a setting to control if this will allow negatives
       return [max_score_per_question*(remaining/settings["timer"]), anstime]
 
     elif settings["mode"] == TIME_ATTACK or settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
@@ -172,24 +182,46 @@ print(colors.WHITE)
 
 # TODO: Can implement a login here. Last priority
 
-# TODO: Print welcome message for the quiz
+# Print welcome message for the quiz
 print("\nWelcome to BTS quiz show\n")
 
-# TODO: Print the instruction
-print("Choose correct answer. Blah blah Explain scoring here\n")
 
-# TODO: Create code here to ask user for the mode. Modes implemented
+# Ask user for mode of the game
+print("Please choose mode (1-4): \n1. Classic \n2. Time-attack \n3. Lifeline \n4. Sudden Death")
+modeInput = int(input().strip())
+if modeInput == 1:
+    settings["mode"]=CLASSIC
 
-# TODO: Add code here to ask for difficulty. If difficulty is already implemented
+elif modeInput == 2:
+    settings["mode"]=TIME_ATTACK
 
-# TODO: What does this variables do?
+elif modeInput == 3:
+    settings["mode"]=LIFELINE
+
+elif modeInput == 4:
+    settings["mode"]=SUDDEN_DEATH
+
+else:
+    settings["mode"]=CLASSIC
+
+# Confirmation of chosen mode
+print("You've chosen:", settings["mode"].capitalize())
+
 List_of_Questions = []
 user = {
-  "username": "Ronnie",
+  "username": "",
   "score": 0,
   "times": [],
   "lives": 5
 }
+
+# Ask player's info
+print("Please insert username: ")
+user["username"]=input()
+
+
+# TODO: Print the instruction
+print("Choose the correct answer. (1-4)")
 
 # Open question bank
 # We can specify the directory if we want
@@ -219,9 +251,6 @@ if settings["mode"] == CLASSIC:
     
     result = item.score_answer()
 
-    # TODO: temporary print
-    print(result[0])
-
     user["score"] = user["score"]+result[0]
     user["times"].append(result[1])
 
@@ -233,7 +262,7 @@ elif settings["mode"] == TIME_ATTACK:
   # TODO: Explain while loop
   while time.time() - start_time < settings["time-attack"]:
 
-    if (id+1) == len(List_of_Questions):
+    if (id+1) > len(List_of_Questions):
       print("Sorry no more questions from question bank. More questions soon")
       break
 
@@ -243,8 +272,6 @@ elif settings["mode"] == TIME_ATTACK:
     item.show_choices()
 
     result = item.score_answer()
-    # TODO: temporary print
-    print(result[0])
 
     user["score"] = user["score"]+result[0]
     user["times"].append(result[1])
@@ -261,7 +288,7 @@ elif settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
   # TODO: Explain while loop
   while user["lives"] > 0:
 
-    if (id+1) == len(List_of_Questions):
+    if (id+1) > len(List_of_Questions):
       print("Sorry no more questions from question bank. More questions soon")
       break
 
@@ -271,8 +298,6 @@ elif settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
     item.show_choices()
 
     result = item.score_answer()
-    # TODO: temporary print
-    print(result[0])
 
     if(result[0]) == 0:
       user["lives"] -= 1
@@ -285,8 +310,4 @@ elif settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
 print("\n", end="")
 
 # TODO: Make a code to display score based from what you want
-for key in user:
-  print(user[key])
-
-# TODO: Delete. This is just a sample code to compute for total time 
-print(sum(user["times"]))
+print("Congratulations ARMY! \nYour final score is: {:.2f}".format(user["score"]))
