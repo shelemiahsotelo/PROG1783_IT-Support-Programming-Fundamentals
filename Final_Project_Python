@@ -120,7 +120,7 @@ class Quiz:
             # No score for wrong answers
             return [0, anstime]
         except ValueError:
-          # TODO: Fix error message when choice is not available
+          # Error message when choice is not available
           print('Choose from a-{} only'.format(self.choice_map[len(self.choices)-1]))
           continue
 
@@ -141,7 +141,7 @@ class Quiz:
 
   # Function for calculating score
   def calc_score(self, anstime):
-    # TODO: Add comments
+    # Score calculated based on the time remaining. As time decreases, the score decreases too. 
     if settings["mode"]==CLASSIC:
       real_time = anstime - self.read_time
       if real_time < 0:
@@ -171,7 +171,9 @@ def start_timer(timer):
 
 ########################### Start of flow ###########################
 
-# TODO: Explain
+# Print the BTS logo
+# It will print it as purple first, then will change it to white.
+# Must use PowerShell or cmd
 print(colors.PURPLE)                 
 print("     ____ _____ ____          ")
 print("    | __ )_   _/ ___|   |\  /|")
@@ -180,14 +182,14 @@ print("    | |_) || |  ___) |  | || |")
 print("    |____/ |_| |____/   |/  \|")
 print(colors.WHITE)
 
-# TODO: Can implement a login here. Last priority
+# TODO: Can implement a login here (for future upgrade)
 
 # Print welcome message for the quiz
 print("\nWelcome to BTS quiz show\n")
 
 
 # Ask user for mode of the game
-print("Please choose mode (1-4): \n1. Classic \n2. Time-attack \n3. Lifeline \n4. Sudden Death")
+print("Please choose mode (1-4): \n1. Classic - 7 questions to answer. Score will be based on how fast player can answer the questions.  \n2. Time-attack - Score will be based on how many questions will be answered in 60 seconds. \n3. Lifeline - You only have 5 lives. The game will end after 5 wrong answers. \n4. Sudden Death - The game will end after the first wrong answer.")
 modeInput = int(input().strip())
 if modeInput == 1:
     settings["mode"]=CLASSIC
@@ -220,7 +222,7 @@ print("Please insert username: ")
 user["username"]=input()
 
 
-# TODO: Print the instruction
+# Print the instruction
 print("Choose the correct answer. (1-4)")
 
 # Open question bank
@@ -241,7 +243,7 @@ random.shuffle(List_of_Questions)
 #Start Timer
 start_timer(5)
 
-# TODO: Explain
+# Game will end after 7 questions, and score will be based on how fast player answered the 7 questions.
 if settings["mode"] == CLASSIC:
   for id in range(0, settings["number_of_questions"]):
     item = List_of_Questions[id]
@@ -254,12 +256,12 @@ if settings["mode"] == CLASSIC:
     user["score"] = user["score"]+result[0]
     user["times"].append(result[1])
 
-# TODO: Explain
+# Game will be in 60 seconds, score will be base on how many questions the player can answer within 60 seconds. 
 elif settings["mode"] == TIME_ATTACK:
   start_time = time.time()
   id = 0
 
-  # TODO: Explain while loop
+  # Game will run until runbank runs out of questions.
   while time.time() - start_time < settings["time-attack"]:
 
     if (id+1) > len(List_of_Questions):
@@ -285,7 +287,9 @@ elif settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
 
   id = 0
 
-  # TODO: Explain while loop
+  # Game will still run until question bank runs out of questions. 
+  # Game will end after 5 wrong answers for LIFELINE
+  # Game will end after 5 wrong answers for SUDDEN_DEATH
   while user["lives"] > 0:
 
     if (id+1) > len(List_of_Questions):
@@ -309,5 +313,5 @@ elif settings["mode"] == LIFELINE or settings["mode"] == SUDDEN_DEATH:
 
 print("\n", end="")
 
-# TODO: Make a code to display score based from what you want
+# Print final game score
 print("Congratulations ARMY! \nYour final score is: {:.2f}".format(user["score"]))
